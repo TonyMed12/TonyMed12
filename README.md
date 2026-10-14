@@ -1,119 +1,161 @@
 <div align="center">
 
-# José Antonio Medina Ayala
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:111827,100:4338CA&height=180&text=JOSÉ%20ANTONIO%20MEDINA&fontSize=32&fontColor=FFFFFF&desc=Software%20Development%20%E2%80%A2%20Systems%20Engineering%20%E2%80%A2%20Continuous%20Learning&descSize=13&descAlignY=68&fontAlignY=42" width="100%" alt="José Antonio Medina — Software Development, Systems Engineering, Continuous Learning" />
 
-### Computer Systems Engineering Student · Software Development
+<br />
+<br />
 
-Building practical solutions through code, collaboration, and continuous learning.
+**Turning ideas into practical software.**
 
-[LinkedIn](https://www.linkedin.com/in/tony-medinaa/) · [GitHub Projects](https://github.com/TonyMed12?tab=repositories)
+Computer Systems Engineering student at **Instituto Tecnológico de Morelia**  
+Programming Technician · Collaborative problem-solver · Curious by nature
+
+<br />
+
+<a href="https://www.linkedin.com/in/tony-medinaa/">
+  <img src="https://img.shields.io/badge/LET'S_CONNECT-LinkedIn-6366F1?style=for-the-badge" alt="Connect on LinkedIn" />
+</a>
+<a href="https://github.com/TonyMed12?tab=repositories">
+  <img src="https://img.shields.io/badge/EXPLORE-My_Projects-2563EB?style=for-the-badge&logo=github&logoColor=white" alt="Explore my projects" />
+</a>
+
+<br />
+<br />
+
+<sub>MORELIA, MEXICO &nbsp; / &nbsp; OPEN TO SOFTWARE DEVELOPMENT INTERNSHIPS</sub>
 
 </div>
 
----
+<br />
 
-## About Me
+## 01 / The person behind the code
 
-I'm a Computer Systems Engineering student at **Instituto Tecnológico de Morelia**, Mexico, with a technical background in programming and experience collaborating on academic software projects.
+I’m **Tony**, a Computer Systems Engineering student interested in building useful software and understanding the decisions behind it.
 
-My interests include **software development, backend systems, and the practical applications of artificial intelligence**. I enjoy understanding how systems work, turning requirements into clear solutions, and helping teams move from ideas to working software.
+My experience combines collaborative software projects, requirements engineering, and Scrum coordination. I enjoy breaking down problems, connecting ideas across a team, and learning through hands-on work.
 
-Through team projects, I've taken on responsibilities in Scrum coordination, requirements documentation, and communication between frontend and backend teams.
+My next step is a **software development internship** where I can contribute to real projects and grow alongside experienced engineers.
 
-I'm seeking a **software development internship** where I can contribute, learn from experienced engineers, and strengthen my ability to build reliable software.
+> **Understand the problem. Build with purpose. Keep improving.**
 
-- **Based in:** Morelia, Michoacán, Mexico
-- **Open to:** Opportunities in Morelia, Querétaro, and remote teams
-- **Main focus:** Software development
-- **Currently strengthening:** Java, Python, data structures, and backend fundamentals
+<br />
 
-## Technical Focus
+## 02 / My development toolkit
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=java,python,ts,js,html,css,git,github&theme=dark" alt="Java, Python, TypeScript, JavaScript, HTML, CSS, Git, and GitHub" />
+
+</div>
+
+<br />
+
+| BUILD | COLLABORATE | EXPLORE |
+| :--- | :--- | :--- |
+| Java, Python, JavaScript & TypeScript | Scrum & team coordination | Backend development with Django |
+| Object-oriented programming | Requirements analysis | REST APIs & persistence |
+| Data structures & collections | Technical documentation | Data science, AI & cloud concepts |
+
+<sub>A snapshot of the technologies I work with and the areas I’m developing.</sub>
+
+<br />
+
+## 03 / Selected work
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+<h3>ProjeXus</h3>
+
+<strong>Project competition management</strong>
+
+<p>A collaborative platform focused on managing project competitions for ICTI Michoacán.</p>
+
+<p><strong>My contribution</strong><br />
+Scrum coordination, progress tracking, and team communication.</p>
 
 <p>
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" />
-  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
-  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub" />
+<img src="https://img.shields.io/badge/Scrum-6366F1?style=flat-square" alt="Scrum" />
+<img src="https://img.shields.io/badge/Team_Coordination-2563EB?style=flat-square" alt="Team coordination" />
 </p>
 
-| Area | Focus |
-| :--- | :--- |
-| Programming | Java, Python, and web development with JavaScript and TypeScript |
-| Software foundations | Object-oriented programming, data structures, algorithms, and collections |
-| Backend learning | Django, REST APIs, persistence, and deployment fundamentals |
-| Team collaboration | Scrum, requirements analysis, technical documentation, and Git workflows |
-| Data and AI learning | NumPy, data manipulation, and introductory machine learning |
+<a href="https://github.com/TonyMed12/ProjeXus"><strong>Explore ProjeXus →</strong></a>
 
-## Selected Projects
+</td>
+<td width="50%" valign="top">
 
-### ProjeXus
-**Project competition management platform**
+<h3>Adopciones CAAM</h3>
 
-A collaborative project focused on managing project competitions for ICTI Michoacán.
+<strong>Animal adoption management</strong>
 
-My role as **Scrum Master** involved coordinating team activities, tracking progress, and supporting communication throughout development.
+<p>A collaborative project for the Centro de Atención Animal de Morelia, covering adoption registration, tracking, and veterinary scheduling.</p>
 
-**Experience:** Scrum · Team coordination · Project planning
+<p><strong>My contribution</strong><br />
+Team leadership, epics, requirements documentation, and frontend–backend coordination.</p>
 
-[Explore the repository →](https://github.com/TonyMed12/ProjeXus)
+<p>
+<img src="https://img.shields.io/badge/Requirements-6366F1?style=flat-square" alt="Requirements engineering" />
+<img src="https://img.shields.io/badge/Team_Leadership-2563EB?style=flat-square" alt="Team leadership" />
+</p>
 
----
+<a href="https://github.com/TonyMed12/Adopciones-CAAM"><strong>Explore Adopciones CAAM →</strong></a>
 
-### Adopciones CAAM
-**Animal adoption management platform**
+</td>
+</tr>
+</table>
 
-A collaborative project for the Centro de Atención Animal de Morelia, covering adoption registration and tracking, alongside veterinary scheduling.
+<br />
 
-My responsibilities included team leadership, organizing epics, preparing requirements documentation, and helping resolve coordination issues between frontend and backend teams.
+## 04 / Foundations & new directions
 
-**Experience:** Requirements engineering · Technical documentation · Team leadership
+**Computer Systems Engineering**  
+Instituto Tecnológico de Morelia · In progress  
+Academic foundations in programming, software engineering, and computational problem-solving.
 
-[Explore the repository →](https://github.com/TonyMed12/Adopciones-CAAM)
+**Programming Technician**  
+Professional credential obtained  
+Technical training that established my foundation in software development.
 
-## Education
+**GCI World 2026**  
+In progress · Data science & artificial intelligence  
+Learning through coursework and practical exercises with Python and NumPy.
 
-### Computer Systems Engineering
-**Instituto Tecnológico de Morelia · In progress**
+<br />
 
-Developing a foundation in programming, software engineering, and computational problem-solving through coursework and collaborative projects.
+## 05 / What I’m working toward
 
-### Programming Technician
-**Professional credential obtained**
+- **Stronger foundations** — Practicing Java, algorithms, and object-oriented design.
+- **Useful backend systems** — Learning to build APIs with clear contracts and persistent data.
+- **Applied AI** — Exploring how data and machine learning can address practical problems.
+- **Professional experience** — Preparing to contribute to a software development team.
 
-Technical training that provided an early foundation in programming and software development.
+<br />
 
-## Additional Learning
+<details>
+<summary><strong>A little beyond software</strong></summary>
 
-### GCI World 2026 · In progress
-International coursework in data science and artificial intelligence, including practical exercises in Python and NumPy.
+<br />
 
-### AWS Skill Builder
-Building familiarity with cloud concepts and exploring learning resources relevant to software development.
+I enjoy football, pádel, traveling, and practicing English. Curiosity drives both my technical learning and my interest in discovering new places and perspectives.
 
-## How I Work
+</details>
 
-- **Understand the problem:** Clarify requirements and the needs behind them.
-- **Make progress visible:** Break work into manageable tasks and communicate clearly.
-- **Learn through practice:** Reinforce concepts by implementing and reviewing solutions.
-- **Collaborate with purpose:** Connect technical work with team goals and project requirements.
-
-## Current Goals
-
-- Strengthen Java problem-solving and object-oriented design.
-- Build backend projects with clear documentation and persistent data.
-- Develop a deeper understanding of data science and AI.
-- Join a software development team for my professional internship.
-
-## Let's Connect
-
-I'm interested in internship opportunities, collaborative projects, and conversations about software development.
-
-**[Connect with me on LinkedIn →](https://www.linkedin.com/in/tony-medinaa/)**
+<br />
 
 ---
 
 <div align="center">
-  <sub>Continuous learning. Thoughtful collaboration. Practical software.</sub>
+
+### Let’s build something useful.
+
+Open to software development internships in  
+**Morelia · Querétaro · Remote**
+
+[Connect on LinkedIn](https://www.linkedin.com/in/tony-medinaa/) · [Browse my repositories](https://github.com/TonyMed12?tab=repositories)
+
+<br />
+
+<sub>José Antonio Medina Ayala · Learning continuously, building with purpose.</sub>
+
 </div>
