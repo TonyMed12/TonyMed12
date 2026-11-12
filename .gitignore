@@ -1,0 +1,5 @@
+.obsidian/
+__pycache__/
+assets/data-cache.json
+assets/project-*.svg
+preview*.html
