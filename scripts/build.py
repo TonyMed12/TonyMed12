@@ -10,11 +10,10 @@ from pathlib import Path
 USER = "TonyMed12"
 NAME = "José Antonio Medina Ayala"
 EMAIL, SITE, LINKEDIN = "tonymed2022@gmail.com", "tonymed.dev", "tony-medinaa"
-BIO = ("Hi, I'm Tony. I'm a 9th-semester Computer Systems Engineering student from Morelia, specializing in software development technologies. I like making things work, and helping "
-       "the people around me do the same. Away from the keyboard you'll find me on a soccer field or a pádel "
-       "court, planning the next trip, or practicing my English.")
+ABOUT = [("WHO I AM", "Systems engineering", "student from Morelia"), ("WHAT I LIKE", "Making things work,", "and helping my team"),
+         ("OFF THE KEYBOARD", "Soccer, pádel, travel", "and practicing English")]
 CEDULA = "15938245"  # numero de cedula (cadena); vacio -> solo se destaca el titulo
-CED = "Cédula profesional técnica" + (f" · No. {CEDULA}" if CEDULA else "")
+CED = "Technical License (Cédula)" + (f" · No. {CEDULA}" if CEDULA else "")
 PHOTO = False  # False -> iniciales en lugar de la foto de GitHub
 OUT = Path(__file__).resolve().parent.parent / "assets"
 OUT.mkdir(exist_ok=True)
@@ -108,6 +107,16 @@ text{{font-family:{SANS}}}.sf{{font-family:{SERIF}}}
 @keyframes fall{{from{{transform:translate(0,-10px)}}50%{{transform:translate(14px,calc(var(--h)/2))}}to{{transform:translate(0,var(--h))}}}}
 .spin{{transform-origin:var(--o);animation:spin 50s linear infinite}}
 @keyframes spin{{to{{transform:rotate(360deg)}}}}
+.dsh{{animation:dsh 6s linear infinite}}
+@keyframes dsh{{to{{stroke-dashoffset:-110}}}}
+.tm{{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards}}
+@keyframes tmin{{from{{opacity:0;transform:translateY(4px)}}to{{opacity:1;transform:none}}}}
+.dot{{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards,dotp 2.6s ease-in-out infinite}}
+@keyframes dotp{{0%,100%{{fill:#93c5fd}}50%{{fill:#f5c26b}}}}
+.flt{{animation:flt 5s ease-in-out infinite}}
+@keyframes flt{{50%{{transform:translateY(-6px)}}}}
+.sway{{animation:sway 4s ease-in-out infinite}}
+@keyframes sway{{50%{{transform:rotate(5deg)}}}}
 .bar{{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:gy .9s cubic-bezier(.2,.8,.2,1) forwards}}
 @keyframes gy{{to{{transform:scaleY(1)}}}}
 .draw{{stroke-dasharray:1400;stroke-dashoffset:1400;animation:dr 2s ease-out .3s forwards}}
@@ -175,45 +184,45 @@ def pine(x, y, s, th, seed):
 # ------------------------------------------------------------------ hero
 def hero(th, d):
     c, w = T[th], 985
-    wrap = textwrap.wrap(BIO, 66)
-    h = 504 + 22 * max(0, len(wrap) - 3)
+    h = 520
     b = snow(th, w, h, 55, 2)
     for i, x in enumerate(range(24, w - 10, 30)):  # guirnalda
         b += f'<circle class="tw" cx="{x}" cy="{12 + 6 * math.sin(x / 36):.1f}" r="3.6" fill="{LIGHTS[i % 5]}" style="animation-delay:-{(i * .7) % 3:.1f}s"/>'
-    # foto con aro dorado y nieve encima
     cx, cy, rad = 168, 178, 100
-    b += (f'<clipPath id="ph"><circle cx="{cx}" cy="{cy}" r="{rad}"/></clipPath>'
-          f'<circle class="spin" style="--o:{cx}px {cy}px" cx="{cx}" cy="{cy}" r="{rad + 20}" fill="none" stroke="{c["gold"]}" stroke-opacity=".5" stroke-dasharray="2 9" stroke-linecap="round"/>'
-          f'<circle cx="{cx}" cy="{cy}" r="{rad + 7}" fill="none" stroke="{c["gold"]}" stroke-width="3"/>')
-    if PHOTO and d.get("avatar"):
-        b += (f'<image class="fd" href="data:image/jpeg;base64,{d["avatar"]}" x="{cx - rad}" y="{cy - rad}" width="{2 * rad}" height="{2 * rad}" '
-              f'preserveAspectRatio="xMidYMid slice" clip-path="url(#ph)"/>')
-    else:  # bola de nieve: sin foto porque GitHub ya la muestra junto al README
-        gr = random.Random(7)
-        b += (f'<defs><radialGradient id="gl" cx=".5" cy=".3" r=".9"><stop offset="0" stop-color="{c["bg1"]}"/><stop offset="1" stop-color="{c["bg0"]}"/></radialGradient></defs>'
-              f'<circle cx="{cx}" cy="{cy}" r="{rad}" fill="url(#gl)"/><g clip-path="url(#ph)">' +
-              "".join(f'<circle class="tw" cx="{cx + gr.uniform(-rad, rad):.0f}" cy="{cy + gr.uniform(-rad, 20):.0f}" r="1.2" fill="{c["ice"]}" style="animation-delay:-{gr.uniform(0, 3):.1f}s"/>' for _ in range(22)) +
-              f'<path d="M{cx - rad} {cy + 52} Q{cx} {cy + 34} {cx + rad} {cy + 56} V{cy + rad} H{cx - rad}Z" fill="{c["hill"]}"/>' +
-              pine(cx - 34, cy + 74, .72, th, 3) + pine(cx + 38, cy + 80, .52, th, 4) + '</g>' +
-              tx(cx, cy - 22, "tm.", 46, c["gold"], "middle", 700, True))
     r2 = random.Random(5)
-    for a in range(-158, -21, 9):  # nieve acumulada sobre el aro
-        ar = math.radians(a)
-        b += f'<circle cx="{cx + (rad + 7) * math.cos(ar):.1f}" cy="{cy + (rad + 7) * math.sin(ar):.1f}" r="{r2.uniform(5, 9):.1f}" fill="#fff"/>'
-    b += tx(cx, cy + rad + 44, "Morelia, México", 12, c["dim"], "middle", ls=1)
+    if PHOTO and d.get("avatar"):  # foto con aro dorado y nieve encima
+        b += (f'<clipPath id="ph"><circle cx="{cx}" cy="{cy}" r="{rad}"/></clipPath>'
+              f'<circle class="spin" style="--o:{cx}px {cy}px" cx="{cx}" cy="{cy}" r="{rad + 20}" fill="none" stroke="{c["gold"]}" stroke-opacity=".5" stroke-dasharray="2 9" stroke-linecap="round"/>'
+              f'<circle cx="{cx}" cy="{cy}" r="{rad + 7}" fill="none" stroke="{c["gold"]}" stroke-width="3"/>'
+              f'<image class="fd" href="data:image/jpeg;base64,{d["avatar"]}" x="{cx - rad}" y="{cy - rad}" width="{2 * rad}" height="{2 * rad}" preserveAspectRatio="xMidYMid slice" clip-path="url(#ph)"/>')
+        for a in range(-158, -21, 9):
+            ar = math.radians(a)
+            b += f'<circle cx="{cx + (rad + 7) * math.cos(ar):.1f}" cy="{cy + (rad + 7) * math.sin(ar):.1f}" r="{r2.uniform(5, 9):.1f}" fill="#fff"/>'
+    else:  # monograma "tm." = favicon de tonymed.dev, animado y con gorro navideno (GitHub ya muestra la foto aparte)
+        sx, sy, sz = cx - rad, cy - rad, 2 * rad
+        b += (f'<ellipse cx="{cx}" cy="{sy + sz + 22}" rx="84" ry="8" fill="{c["ice"]}" opacity=".18"/><g class="flt">'
+              f'<svg x="{sx}" y="{sy}" width="{sz}" height="{sz}" viewBox="0 0 64 64" overflow="visible"><rect x=".4" y=".4" width="63.2" height="63.2" rx="14" fill="#101c36" stroke="#93c5fd" stroke-opacity=".45" stroke-width=".8"/>'
+              f'<g font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="700" style="font-family:Arial,Helvetica,sans-serif">'
+              f'<text class="tm" x="10" y="43" fill="#93c5fd" style="animation-delay:.3s">t</text>'
+              f'<text class="tm" x="17" y="43" fill="#93c5fd" style="animation-delay:.7s">m</text>'
+              f'<text class="dot" x="40.7" y="43" fill="#93c5fd" style="animation-delay:1.1s,2.2s">.</text></g></svg>'
+              f'<g transform="translate({sx + 40} {sy + 6}) rotate(-12)"><g class="sway">'  # gorro de Santa sobre la esquina
+              f'<path d="M-34 -4 Q-24 -74 22 -66 Q12 -42 34 -4Z" fill="#dc2626"/>'
+              f'<rect x="-42" y="-10" width="84" height="20" rx="10" fill="#fff"/><circle cx="23" cy="-66" r="10" fill="#fff"/></g></g></g>')
+    b += tx(cx, cy + rad + 50, "Morelia, México", 12, c["dim"], "middle", ls=1)
     # texto
     x0 = 330
-    b += (tx(x0, 66, "SOFTWARE DEVELOPMENT  ·  SYSTEMS ENGINEERING", 11, c["gold"], weight=700, ls=3, cls="up", delay=.1) +
+    b += (tx(x0, 66, "COMPUTER SYSTEMS ENGINEERING STUDENT  ·  SOFTWARE DEVELOPMENT", 11, c["gold"], weight=700, ls=3, cls="up", delay=.1) +
           tx(x0, 112, "José Antonio", 44, c["fg"], weight=700, serif=True, cls="up", delay=.25) +
           tx(x0, 158, "Medina Ayala", 44, c["fg"], weight=700, serif=True, cls="up", delay=.4))
-    y = 196
-    for i, ln in enumerate(wrap):
-        b += tx(x0, y, ln, 15, c["dim"], cls="up", delay=.7 + i * .15)
-        y += 22
-    y += 8
-    x, row = x0, y
-    for s, kw in [("Open to internships & junior roles", dict(dot=c["ok"], bold=True)), ("Available now · will relocate to any city below", dict(color=c["gold"], bold=True)), (CED, dict(color=c["ok"], bold=True)),
-                  ("Morelia · Acámbaro · Querétaro · Remote", {})]:
+    b += tx(x0, 194, "Hi, I'm Tony.", 20, c["gold"], weight=700, serif=True, cls="up", delay=.6)
+    for i, (lab, l1, l2) in enumerate(ABOUT):
+        bx, dl = x0 + i * 214, .8 + i * .15
+        b += (tile(bx, 208, 200, 72, th, 12) + tx(bx + 14, 228, lab, 8.5, c["gold"], weight=700, ls=1.6, cls="up", delay=dl) +
+              tx(bx + 14, 249, l1, 12, c["fg"], weight=600, cls="up", delay=dl) + tx(bx + 14, 266, l2, 12, c["dim"], cls="up", delay=dl))
+    x, row = x0, 302
+    for s, kw in [("Open to internships & junior roles", dict(dot=c["ok"], bold=True)), (CED, dict(color=c["ok"], bold=True)),
+                  ("Available now · will relocate to Morelia, Acámbaro or Querétaro · hybrid or remote", dict(color=c["gold"], bold=True))]:
         if x + len(s) * 11.5 * .56 + 36 > 962: x, row = x0, row + 32
         o, wd = chip(x, row, s, th, 11.5, **kw); b += o; x += wd + 10
     y = row + 40
@@ -278,7 +287,7 @@ def about(th, d):
     # educacion
     b += tile(24, 24, 300, 168, th) + head(44, 52, "EDUCATION")
     y = 80
-    edu = [("Ingeniería en Sistemas Computacionales", ["Instituto Tecnológico de Morelia · 9th semester", "Especialidad en Tecnologías de", "Desarrollo de Software"]),
+    edu = [("Computer Systems Engineering", ["Instituto Tecnológico de Morelia · 9th semester", "Specialization in Software", "Development Technologies"]),
            ("Programming Technician", [CED])]
     for i, (t1, subs) in enumerate(edu):
         nxt = y + 17 + 14 * (len(subs) - 1) + 24
