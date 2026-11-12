@@ -10,7 +10,7 @@ from pathlib import Path
 USER = "TonyMed12"
 NAME = "José Antonio Medina Ayala"
 EMAIL, SITE, LINKEDIN = "tonymed2022@gmail.com", "tonymed.dev", "tony-medinaa"
-ABOUT = [("WHO I AM", "Systems engineering", "student from Morelia"), ("WHAT I LIKE", "Making things work,", "and helping my team"),
+ABOUT = [("WHO I AM", "Computer Systems Engineering", "9th-semester student, Morelia"), ("WHAT I LIKE", "Learning something", "new every week"),
          ("OFF THE KEYBOARD", "Soccer, pádel, travel", "and practicing English")]
 CEDULA = "15938245"  # numero de cedula (cadena); vacio -> solo se destaca el titulo
 CED = "Technical License (Cédula)" + (f" · No. {CEDULA}" if CEDULA else "")
@@ -110,6 +110,8 @@ text{{font-family:{SANS}}}.sf{{font-family:{SERIF}}}
 .dsh{{animation:dsh 6s linear infinite}}
 @keyframes dsh{{to{{stroke-dashoffset:-110}}}}
 .tm{{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards}}
+@keyframes nudge{{50%{{transform:translateX(5px)}}}}
+.nudge{{animation:nudge 1.6s ease-in-out infinite}}
 @keyframes tmin{{from{{opacity:0;transform:translateY(4px)}}to{{opacity:1;transform:none}}}}
 .dot{{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards,dotp 2.6s ease-in-out infinite}}
 @keyframes dotp{{0%,100%{{fill:#93c5fd}}50%{{fill:#f5c26b}}}}
@@ -217,8 +219,8 @@ def hero(th, d):
           tx(x0, 158, "Medina Ayala", 44, c["fg"], weight=700, serif=True, cls="up", delay=.4))
     b += tx(x0, 194, "Hi, I'm Tony.", 20, c["gold"], weight=700, serif=True, cls="up", delay=.6)
     for i, (lab, l1, l2) in enumerate(ABOUT):
-        bx, dl = x0 + i * 214, .8 + i * .15
-        b += (tile(bx, 208, 200, 72, th, 12) + tx(bx + 14, 228, lab, 8.5, c["gold"], weight=700, ls=1.6, cls="up", delay=dl) +
+        bx, dl = x0 + sum((236, 186, 186)[:i]) + 12 * i, .8 + i * .15
+        b += (tile(bx, 208, (236, 186, 186)[i], 72, th, 12) + tx(bx + 14, 228, lab, 8.5, c["gold"], weight=700, ls=1.6, cls="up", delay=dl) +
               tx(bx + 14, 249, l1, 12, c["fg"], weight=600, cls="up", delay=dl) + tx(bx + 14, 266, l2, 12, c["dim"], cls="up", delay=dl))
     x, row = x0, 302
     for s, kw in [("Open to internships & junior roles", dict(dot=c["ok"], bold=True)), (CED, dict(color=c["ok"], bold=True)),
@@ -226,8 +228,13 @@ def hero(th, d):
         if x + len(s) * 11.5 * .56 + 36 > 962: x, row = x0, row + 32
         o, wd = chip(x, row, s, th, 11.5, **kw); b += o; x += wd + 10
     y = row + 40
-    items = [("EMAIL", EMAIL), ("PORTFOLIO", SITE), ("LINKEDIN", LINKEDIN), ("GITHUB", USER)]
-    x = x0
+    items = [("GITHUB", USER), ("EMAIL", EMAIL), ("LINKEDIN", LINKEDIN)]
+    t1 = "Get to know me better"
+    cw_ = 14 + len(t1) * 7.1 + 30 + len(SITE) * 6.9 + 12
+    b += (f'<rect x="{x0}" y="{y}" width="{cw_:.0f}" height="26" rx="13" fill="{c["gold"]}" fill-opacity=".2" stroke="{c["gold"]}" stroke-width="1.6"/>' +
+          tx(x0 + 14, y + 17.5, t1, 12, c["fg"], weight=700) + tx(f"{x0 + 14 + len(t1) * 7.1 + 6:.0f}", y + 18, "→", 13, c["gold"], weight=700, cls="nudge") +
+          tx(f"{x0 + 14 + len(t1) * 7.1 + 28:.0f}", y + 17.5, SITE, 12, c["gold"], weight=700))
+    x = x0 + cw_ + 10
     for i, (k, v) in enumerate(items):
         wd = 22 + len(k) * 7.4 + 10 + len(v) * 6.9
         if x + wd > 790: x, y = x0, y + 34

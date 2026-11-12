@@ -10,6 +10,18 @@ text{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif}.sf{font-family:Ge
 @keyframes fall{from{transform:translate(0,-10px)}50%{transform:translate(14px,calc(var(--h)/2))}to{transform:translate(0,var(--h))}}
 .spin{transform-origin:var(--o);animation:spin 50s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.dsh{animation:dsh 6s linear infinite}
+@keyframes dsh{to{stroke-dashoffset:-110}}
+.tm{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes nudge{50%{transform:translateX(5px)}}
+.nudge{animation:nudge 1.6s ease-in-out infinite}
+@keyframes tmin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dot{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards,dotp 2.6s ease-in-out infinite}
+@keyframes dotp{0%,100%{fill:#93c5fd}50%{fill:#f5c26b}}
+.flt{animation:flt 5s ease-in-out infinite}
+@keyframes flt{50%{transform:translateY(-6px)}}
+.sway{animation:sway 4s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(5deg)}}
 .bar{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:gy .9s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes gy{to{transform:scaleY(1)}}
 .draw{stroke-dasharray:1400;stroke-dashoffset:1400;animation:dr 2s ease-out .3s forwards}
