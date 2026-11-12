@@ -10,12 +10,12 @@ from pathlib import Path
 USER = "TonyMed12"
 NAME = "José Antonio Medina Ayala"
 EMAIL, SITE, LINKEDIN = "tonymed2022@gmail.com", "tonymed.dev", "tony-medinaa"
-BIO = ("Hi, I'm Tony. I'm a 9th-semester systems engineering student from Morelia who likes making things work, and helping "
+BIO = ("Hi, I'm Tony. I'm a 9th-semester Computer Systems Engineering student from Morelia, specializing in software development technologies. I like making things work, and helping "
        "the people around me do the same. Away from the keyboard you'll find me on a soccer field or a pádel "
        "court, planning the next trip, or practicing my English.")
 CEDULA = "15938245"  # numero de cedula (cadena); vacio -> solo se destaca el titulo
 CED = "Cédula profesional técnica" + (f" · No. {CEDULA}" if CEDULA else "")
-PHOTO = True  # False -> iniciales en lugar de la foto de GitHub
+PHOTO = False  # False -> iniciales en lugar de la foto de GitHub
 OUT = Path(__file__).resolve().parent.parent / "assets"
 OUT.mkdir(exist_ok=True)
 CACHE = OUT / "data-cache.json"
@@ -188,8 +188,14 @@ def hero(th, d):
     if PHOTO and d.get("avatar"):
         b += (f'<image class="fd" href="data:image/jpeg;base64,{d["avatar"]}" x="{cx - rad}" y="{cy - rad}" width="{2 * rad}" height="{2 * rad}" '
               f'preserveAspectRatio="xMidYMid slice" clip-path="url(#ph)"/>')
-    else:
-        b += f'<circle cx="{cx}" cy="{cy}" r="{rad}" fill="{c["tile"]}" fill-opacity=".1"/>' + tx(cx, cy + 22, "JM", 64, c["gold"], "middle", 700, True)
+    else:  # bola de nieve: sin foto porque GitHub ya la muestra junto al README
+        gr = random.Random(7)
+        b += (f'<defs><radialGradient id="gl" cx=".5" cy=".3" r=".9"><stop offset="0" stop-color="{c["bg1"]}"/><stop offset="1" stop-color="{c["bg0"]}"/></radialGradient></defs>'
+              f'<circle cx="{cx}" cy="{cy}" r="{rad}" fill="url(#gl)"/><g clip-path="url(#ph)">' +
+              "".join(f'<circle class="tw" cx="{cx + gr.uniform(-rad, rad):.0f}" cy="{cy + gr.uniform(-rad, 20):.0f}" r="1.2" fill="{c["ice"]}" style="animation-delay:-{gr.uniform(0, 3):.1f}s"/>' for _ in range(22)) +
+              f'<path d="M{cx - rad} {cy + 52} Q{cx} {cy + 34} {cx + rad} {cy + 56} V{cy + rad} H{cx - rad}Z" fill="{c["hill"]}"/>' +
+              pine(cx - 34, cy + 74, .72, th, 3) + pine(cx + 38, cy + 80, .52, th, 4) + '</g>' +
+              tx(cx, cy - 22, "tm.", 46, c["gold"], "middle", 700, True))
     r2 = random.Random(5)
     for a in range(-158, -21, 9):  # nieve acumulada sobre el aro
         ar = math.radians(a)
@@ -271,11 +277,16 @@ def about(th, d):
 
     # educacion
     b += tile(24, 24, 300, 168, th) + head(44, 52, "EDUCATION")
-    for i, (t1, t2) in enumerate([("Ingeniería en Sistemas Computacionales", "Instituto Tecnológico de Morelia · 9th semester"),
-                                  ("Programming Technician", CED)]):
-        yy = 84 + i * 50
-        b += f'<circle cx="52" cy="{yy - 4}" r="4" fill="{c["gold"]}"/>' + (f'<line x1="52" x2="52" y1="{yy + 2}" y2="{yy + 38}" stroke="{c["gold"]}" stroke-opacity=".35"/>' if i == 0 else "")
-        b += tx(66, yy, t1, 11.2, c["fg"], weight=600, serif=True) + tx(66, yy + 18, t2, 11, c["dim"])
+    y = 80
+    edu = [("Ingeniería en Sistemas Computacionales", ["Instituto Tecnológico de Morelia · 9th semester", "Especialidad en Tecnologías de", "Desarrollo de Software"]),
+           ("Programming Technician", [CED])]
+    for i, (t1, subs) in enumerate(edu):
+        nxt = y + 17 + 14 * (len(subs) - 1) + 24
+        b += f'<circle cx="52" cy="{y - 4}" r="4" fill="{c["gold"]}"/>' + (f'<line x1="52" x2="52" y1="{y + 2}" y2="{nxt - 10}" stroke="{c["gold"]}" stroke-opacity=".35"/>' if i == 0 else "")
+        b += tx(66, y, t1, 11.2, c["fg"], weight=600, serif=True)
+        for k, t2 in enumerate(subs):
+            b += tx(66, y + 17 + 14 * k, t2, 10.5, c["gold"] if k else c["dim"], weight=600 if k else 400)
+        y = nxt
     # idiomas
     b += tile(340, 24, 300, 168, th) + head(360, 52, "LANGUAGES")
     b += tx(360, 88, "Spanish", 14, c["fg"], weight=600, serif=True) + tx(620, 88, "Native", 11, c["dim"], "end")
