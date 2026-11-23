@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="292" viewBox="0 0 480 292" role="img" aria-label="Hackapony — Hackathon · 2026"><title>Hackapony — Hackathon · 2026</title><style>
+text{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif}.sf{font-family:Georgia,'Times New Roman',serif}
+.up{opacity:0;animation:up .7s ease-out forwards}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fd{opacity:0;animation:fd 1.2s ease-out .1s forwards}
+@keyframes fd{to{opacity:1}}
+.tw{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+.sn{animation:fall linear infinite}
+@keyframes fall{from{transform:translate(0,-10px)}50%{transform:translate(14px,calc(var(--h)/2))}to{transform:translate(0,var(--h))}}
+.spin{transform-origin:var(--o);animation:spin 50s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dsh{animation:dsh 6s linear infinite}
+@keyframes dsh{to{stroke-dashoffset:-110}}
+.tm{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes nudge{50%{transform:translateX(5px)}}
+.nudge{animation:nudge 1.6s ease-in-out infinite}
+@keyframes tmin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dot{opacity:0;animation:tmin .7s cubic-bezier(.2,.8,.2,1) forwards,dotp 2.6s ease-in-out infinite}
+@keyframes dotp{0%,100%{fill:#93c5fd}50%{fill:#f5c26b}}
+.flt{animation:flt 5s ease-in-out infinite}
+@keyframes flt{50%{transform:translateY(-6px)}}
+.sway{animation:sway 4s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(5deg)}}
+.bar{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:gy .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes gy{to{transform:scaleY(1)}}
+.draw{stroke-dasharray:1400;stroke-dashoffset:1400;animation:dr 2s ease-out .3s forwards}
+@keyframes dr{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}}
+</style><defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f8fd"/><stop offset="1" stop-color="#e3ecf9"/></linearGradient></defs><rect width="480" height="292" rx="18" fill="url(#bg)"/><g opacity="1"><rect x="0.5" y="0.5" width="479" height="291" rx="18" fill="#ffffff" fill-opacity=".85" stroke="#9fb3d1" stroke-opacity=".55"/><rect x="0.5" y="22" width="4" height="64" rx="2" fill="#b7791f"/><text x="28" y="42" font-size="12" fill="#b7791f" text-anchor="start" font-weight="700" class="sf " letter-spacing="1">01</text><text x="54" y="42" font-size="9.5" fill="#475569" text-anchor="start" font-weight="600" >· enrmar17/hackapony</text><text x="454" y="42" font-size="9.5" fill="#8493ab" text-anchor="end" font-weight="600"  letter-spacing="1.6">HACKATHON · 2026</text><text x="28" y="80" font-size="25" fill="#0f172a" text-anchor="start" font-weight="700" class="sf ">Hackapony</text><text x="28" y="106" font-size="12.5" fill="#475569" text-anchor="start" font-weight="400" >Urban mobility web app for the ITM, built during a hackathon</text><text x="28" y="125" font-size="12.5" fill="#475569" text-anchor="start" font-weight="400" >and deployed on Vercel.</text><rect x="28" y="150" width="77" height="24" rx="12.0" fill="#ffffff" fill-opacity=".85" stroke="#b7791f" stroke-opacity="1"/><text x="39" y="165.96" font-size="11" fill="#b7791f" text-anchor="start" font-weight="600" >Developer</text><line x1="28" x2="452" y1="196" y2="196" stroke="#9fb3d1" stroke-opacity=".55"/><text x="28" y="230" font-size="22" fill="#0f172a" text-anchor="start" font-weight="700" class="sf ">68</text><text x="28" y="247" font-size="9" fill="#8493ab" text-anchor="start" font-weight="600"  letter-spacing="1.6">COMMITS</text><text x="168" y="230" font-size="22" fill="#0f172a" text-anchor="start" font-weight="700" class="sf ">4</text><text x="168" y="247" font-size="9" fill="#8493ab" text-anchor="start" font-weight="600"  letter-spacing="1.6">PEOPLE</text><text x="308" y="230" font-size="15" fill="#2b6cb0" text-anchor="start" font-weight="700" class="sf ">Vercel</text><text x="308" y="247" font-size="9" fill="#8493ab" text-anchor="start" font-weight="600"  letter-spacing="1.6">LIVE</text><text x="28" y="276" font-size="10" fill="#2b6cb0" text-anchor="start" font-weight="600" ># TypeScript</text><text x="120" y="276" font-size="10" fill="#2b6cb0" text-anchor="start" font-weight="600" ># PostgreSQL</text><text x="212" y="276" font-size="10" fill="#2b6cb0" text-anchor="start" font-weight="600" ># Vercel</text><text x="454" y="276" font-size="10" fill="#8493ab" text-anchor="end" font-weight="400" >mobilidadurbanaitm.vercel.app ↗</text></g><circle class="sn" cx="158" cy="0" r="3.0" fill="#9fb3d1" opacity="0.48" style="--h:292px;animation-duration:10.6s;animation-delay:-14.7s"/><circle class="sn" cx="289" cy="0" r="3.0" fill="#9fb3d1" opacity="0.53" style="--h:292px;animation-duration:12.8s;animation-delay:-3.1s"/><circle class="sn" cx="91" cy="0" r="3.0" fill="#9fb3d1" opacity="0.88" style="--h:292px;animation-duration:8.9s;animation-delay:-14.0s"/><circle class="sn" cx="367" cy="0" r="1.0" fill="#9fb3d1" opacity="0.53" style="--h:292px;animation-duration:10.1s;animation-delay:-2.9s"/><circle class="sn" cx="97" cy="0" r="1.5" fill="#9fb3d1" opacity="0.54" style="--h:292px;animation-duration:9.9s;animation-delay:-10.6s"/><circle class="sn" cx="23" cy="0" r="2.2" fill="#9fb3d1" opacity="0.64" style="--h:292px;animation-duration:10.9s;animation-delay:-10.3s"/></svg>

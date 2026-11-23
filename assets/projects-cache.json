@@ -6,18 +6,19 @@
   "rank": 1,
   "team": 7
  },
- "aquamarine-resort": {
-  "commits": 0,
-  "prs": 0,
-  "pushed": "2025-05-10",
-  "team": 2
- },
  "gestor-cfdi": {
   "commits": 8,
   "prs": 0,
   "pushed": "2026-11-18",
   "rank": 1,
   "team": 2
+ },
+ "hackapony": {
+  "commits": 68,
+  "prs": 1,
+  "pushed": "2026-11-19",
+  "rank": 2,
+  "team": 4
  },
  "projexus": {
   "commits": 52,

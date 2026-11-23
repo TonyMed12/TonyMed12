@@ -440,7 +440,8 @@ def repo_metrics(p, cache):
     except Exception as ex:
         print(f"aviso: {sl}: busqueda de PRs fallo ({why(ex)})", file=sys.stderr)
     m["commits"] = mine
-    for k, v in (cache.get(sl) or {}).items(): m.setdefault(k, v)  # lo que fallo hoy se completa con el ultimo dato bueno
+    for k, v in (cache.get(sl) or {}).items():  # lo que fallo hoy (None o ausente) se completa con el ultimo dato bueno
+        if m.get(k) is None: m[k] = v
     if mine == 0:
         print(f"aviso: {sl}: 0 commits tuyos en {full}. Probable: los commits se hicieron con un correo no vinculado a tu cuenta "
               f"(GitHub > Settings > Emails) o el equipo uso squash merge (la tarjeta muestra los PRs fusionados: {m.get('prs')}).", file=sys.stderr)
