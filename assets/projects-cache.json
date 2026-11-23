@@ -1,0 +1,30 @@
+{
+ "adopciones-caam": {
+  "commits": 122,
+  "prs": 11,
+  "pushed": "2026-05-30",
+  "rank": 1,
+  "team": 7
+ },
+ "gestor-cfdi": {
+  "commits": 8,
+  "prs": 0,
+  "pushed": "2026-11-18",
+  "rank": 1,
+  "team": 2
+ },
+ "hackapony": {
+  "commits": 68,
+  "prs": 1,
+  "pushed": "2026-11-19",
+  "rank": 2,
+  "team": 4
+ },
+ "projexus": {
+  "commits": 52,
+  "prs": 1,
+  "pushed": "2025-06-03",
+  "rank": 1,
+  "team": 4
+ }
+}

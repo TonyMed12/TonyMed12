@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Genera las tarjetas SVG animadas del perfil en ../assets.
 
-  python scripts/build.py            # usa la API publica de GitHub (sin token) y guarda cache
-  python scripts/build.py --offline  # usa assets/data-cache.json
+  python scripts/build.py            # con PROFILE_TOKEN usa GraphQL (actividad privada agregada); sin token, API publica
+  python scripts/build.py --offline  # solo usa assets/data-cache.json y assets/projects-cache.json
+Los proyectos se editan en scripts/projects.json. Nada de repos privados se escribe en SVG, cache o README
+(salvo "public_ok": true en el proyecto).
 """
-import base64, datetime as dt, html, json, math, random, re, sys, textwrap, urllib.request
+import base64, datetime as dt, html, json, math, os, random, re, sys, textwrap, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
 USER = "TonyMed12"
@@ -18,6 +20,8 @@ PHOTO = False  # False -> iniciales en lugar de la foto de GitHub
 OUT = Path(__file__).resolve().parent.parent / "assets"
 OUT.mkdir(exist_ok=True)
 CACHE = OUT / "data-cache.json"
+PCACHE = OUT / "projects-cache.json"
+HERE = Path(__file__).resolve().parent
 SANS = "'Segoe UI','Helvetica Neue',Arial,sans-serif"
 SERIF = "Georgia,'Times New Roman',serif"
 e = html.escape
@@ -38,46 +42,112 @@ LIGHTS = ["#ef4444", "#facc15", "#38bdf8", "#34d399", "#f472b6"]
 
 
 # ------------------------------------------------------------------ datos
-def get(url, raw=False):
-    req = urllib.request.Request(url, headers={"User-Agent": "profile-cards", "Accept": "application/vnd.github+json"})
-    with urllib.request.urlopen(req, timeout=20) as r:
+API = "https://api.github.com"
+TOKEN = os.environ.get("PROFILE_TOKEN") or os.environ.get("GITHUB_TOKEN") or ""
+TODAY = dt.date.today()
+LEVEL = {"NONE": 0, "FIRST_QUARTILE": 1, "SECOND_QUARTILE": 2, "THIRD_QUARTILE": 3, "FOURTH_QUARTILE": 4}
+
+
+class _Redirect(urllib.request.HTTPRedirectHandler):
+    """Si una redireccion sale de api.github.com, el token no la acompana."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        n = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if n and not newurl.startswith(API + "/"):
+            n.headers.pop("Authorization", None)
+            n.unredirected_hdrs.pop("Authorization", None)
+        return n
+
+
+_OPEN = urllib.request.build_opener(_Redirect).open
+
+
+def get(url, raw=False, data=None):
+    h = {"User-Agent": "profile-cards", "Accept": "application/vnd.github+json"}
+    if TOKEN and url.startswith(API + "/"):  # el token solo viaja a api.github.com y nunca se imprime
+        h["Authorization"] = f"bearer {TOKEN}"
+    req = urllib.request.Request(url, data=json.dumps(data).encode() if data else None, headers=h)
+    with _OPEN(req, timeout=30) as r:
         b = r.read()
     return b if raw else json.loads(b)
 
 
-def fetch():
-    u = get(f"https://api.github.com/users/{USER}")
-    repos = [r for r in get(f"https://api.github.com/users/{USER}/repos?per_page=100") if not r["fork"]]
-    langs, proj = {}, {}
-    for r in repos:
+def why(ex):
+    """Descripcion corta y segura (sin URLs ni cabeceras) de un error."""
+    return f"HTTP {ex.code}" if isinstance(ex, urllib.error.HTTPError) else type(ex).__name__
+
+
+def graphql(query, **variables):
+    res = get(API + "/graphql", data={"query": query, "variables": variables})
+    if res.get("errors"):
+        raise RuntimeError("; ".join(x.get("message", "") for x in res["errors"])[:160])
+    return res["data"]
+
+
+# Los repos privados solo se consultan para sumar bytes de lenguaje: nunca se pide su nombre ni su URL.
+Q_USER = """query($l:String!){ user(login:$l){ id createdAt followers{totalCount}
+  repositoriesContributedTo(first:1, contributionTypes:[COMMIT,PULL_REQUEST,REPOSITORY]){totalCount}
+  repositories(first:1, ownerAffiliations:OWNER, privacy:PUBLIC){totalCount} } }"""
+Q_LANGS = """query($l:String!, $after:String){ user(login:$l){
+  repositories(first:100, after:$after, isFork:false, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER]){
+    pageInfo{hasNextPage endCursor} nodes{ languages(first:10, orderBy:{field:SIZE, direction:DESC}){ edges{ size node{name} } } } } } }"""
+Q_YEAR = """query($l:String!, $from:DateTime!, $to:DateTime!){ user(login:$l){
+  contributionsCollection(from:$from, to:$to){ totalCommitContributions totalPullRequestContributions restrictedContributionsCount
+    contributionCalendar{ weeks{ contributionDays{ date contributionCount contributionLevel } } } } } }"""
+
+
+def fetch_graphql():
+    u = graphql(Q_USER, l=USER)["user"]
+    days, commits, prs = {}, 0, 0
+    for y in range(int(u["createdAt"][:4]), TODAY.year + 1):
+        col = graphql(Q_YEAR, l=USER, **{"from": f"{y}-01-01T00:00:00Z", "to": f"{y}-12-31T23:59:59Z"})["user"]["contributionsCollection"]
+        commits += col["totalCommitContributions"]
+        prs += col["totalPullRequestContributions"]
+        for wk in col["contributionCalendar"]["weeks"]:
+            for dy in wk["contributionDays"]:
+                days[dy["date"]] = (dy["contributionCount"], LEVEL.get(dy["contributionLevel"], 0))
+    last = graphql(Q_YEAR, l=USER, **{"from": f"{TODAY - dt.timedelta(days=364)}T00:00:00Z", "to": f"{TODAY}T23:59:59Z"})["user"]["contributionsCollection"]
+    langs, after = {}, None
+    while True:
+        r = graphql(Q_LANGS, l=USER, after=after)["user"]["repositories"]
+        for n in r["nodes"]:
+            for e_ in n["languages"]["edges"]:
+                langs[e_["node"]["name"]] = langs.get(e_["node"]["name"], 0) + e_["size"]
+        if not r["pageInfo"]["hasNextPage"]: break
+        after = r["pageInfo"]["endCursor"]
+    since = (TODAY - dt.timedelta(days=371)).isoformat()
+    cal = [(d_, *days[d_]) for d_ in sorted(days) if since < d_ <= TODAY.isoformat()]
+    return dict(user=dict(repos=u["repositories"]["totalCount"], followers=u["followers"]["totalCount"]), langs=langs, cal=cal,
+                commits=commits, prs=prs, contributed=u["repositoriesContributedTo"]["totalCount"],
+                private_1y=last["restrictedContributionsCount"], since=int(u["createdAt"][:4]))
+
+
+def fetch_public():
+    """Respaldo sin token: solo repos publicos y el calendario publico (scraping)."""
+    u = get(f"{API}/users/{USER}")
+    langs = {}
+    for r in get(f"{API}/users/{USER}/repos?per_page=100"):
+        if r["fork"]: continue
         for k, v in get(r["languages_url"]).items():
             langs[k] = langs.get(k, 0) + v
-        try:
-            c = get(f"https://api.github.com/repos/{USER}/{r['name']}/contributors?per_page=30")
-            if isinstance(c, list):
-                me = next((x["contributions"] for x in c if x["login"] == USER), 0)
-                proj[r["name"]] = dict(commits=me, team=len([x for x in c if "[bot]" not in x["login"]]),
-                                       rank=1 + sum(x["contributions"] > me for x in c), pushed=r["pushed_at"][:10])
-        except Exception:
-            pass
     page = get(f"https://github.com/users/{USER}/contributions", raw=True).decode("utf-8")
     cells = re.findall(r'data-date="([\d-]+)"[^>]*data-level="(\d)"', page)
     tips = re.findall(r"<tool-tip[^>]*>([^<]+)</tool-tip>", page)
-    cal = sorted((d, int(re.match(r"(\d+)", t).group(1)) if t[0].isdigit() else 0, int(l))
-                 for (d, l), t in zip(cells, tips))
-    commits = get(f"https://api.github.com/search/commits?q=author:{USER}")["total_count"]
-    prs = get(f"https://api.github.com/search/issues?q=author:{USER}+type:pr")["total_count"]
-    avatar = get(u["avatar_url"] + "&s=420", raw=True) if PHOTO else b""
-    return dict(user=dict(repos=u["public_repos"], followers=u["followers"]), langs=langs, proj=proj, cal=cal,
-                commits=commits, prs=prs, avatar=base64.b64encode(avatar).decode())
+    cal = sorted((d_, int(re.match(r"(\d+)", t).group(1)) if t[0].isdigit() else 0, int(l)) for (d_, l), t in zip(cells, tips))
+    commits = get(f"{API}/search/commits?q=author:{USER}")["total_count"]
+    prs = get(f"{API}/search/issues?q=author:{USER}+type:pr")["total_count"]
+    return dict(user=dict(repos=u["public_repos"], followers=u["followers"]), langs=langs, cal=cal, commits=commits, prs=prs)
 
 
 def load():
     if "--offline" not in sys.argv:
-        try:
-            d = fetch(); CACHE.write_text(json.dumps(d), encoding="utf-8"); return d
-        except Exception as ex:
-            print("sin red/API, uso cache:", ex)
+        for name, fn in (("graphql", fetch_graphql), ("public", fetch_public)):
+            if name == "graphql" and not TOKEN: continue
+            try:
+                d = fn(); d["mode"] = name
+                CACHE.write_text(json.dumps(d), encoding="utf-8"); print("datos:", name); return d
+            except Exception as ex:
+                print(f"aviso: fallo el modo {name} ({why(ex)}); sigo con el siguiente o con la cache", file=sys.stderr)
     return json.loads(CACHE.read_text(encoding="utf-8"))
 
 
@@ -264,23 +334,19 @@ TOOLBOX = [
 
 
 def toolbox(th, y0):
-    """Etiquetas por grupo en 4 columnas; devuelve (svg, alto)."""
-    c, out, y = T[th], "", y0
-    for r in range(0, len(TOOLBOX), 4):
-        rh = 0
-        for i, (g, items) in enumerate(TOOLBOX[r:r + 4]):
-            gx = x = 44 + i * 224
-            yy = y + 12
-            out += tx(gx, y, g, 10.5, c["dim"], weight=600)
-            for t in items:
-                wd = len(t) * 6.4 + 20
-                if x + wd > gx + 208: x, yy = gx, yy + 30
-                out += (f'<rect x="{x:.0f}" y="{yy}" width="{wd:.0f}" height="24" rx="12" fill="none" stroke="{c["ice"]}" stroke-opacity=".6"/>' +
-                        tx(f"{x + 10:.0f}", yy + 16, t, 11, c["fg"]))
-                x += wd + 6
-            rh = max(rh, yy + 24 - y)
-        y += rh + 22
-    return out, y - y0
+    """Una fila por grupo: etiqueta a la izquierda y herramientas en linea separadas por puntos; devuelve (svg, alto)."""
+    c, out = T[th], ""
+    dots = [c["gold"], c["ice"], c["ok"], "#f472b6", "#a78bfa", "#f59e0b", "#38bdf8", "#fb7185"]
+    for i, (g, items) in enumerate(TOOLBOX):
+        y, dl = y0 + i * 32, .3 + i * .08
+        if i: out += f'<line x1="44" x2="941" y1="{y - 18}" y2="{y - 18}" stroke="{c["edge"]}" stroke-opacity="{c["edgeo"]}"/>'
+        out += (f'<circle cx="48" cy="{y - 4}" r="3.5" fill="{dots[i % len(dots)]}"/>' + tx(60, y, g, 11, c["dim"], weight=600, cls="up", delay=dl))
+        x = 216
+        for k, t in enumerate(items):
+            if k:
+                out += tx(f"{x:.0f}", y, "·", 13, c["faint"], cls="up", delay=dl); x += 14
+            out += tx(f"{x:.0f}", y, t, 12.5, c["fg"], cls="up", delay=dl); x += len(t) * 6.5 + 12
+    return out, 32 * len(TOOLBOX) - 6
 
 
 def about(th, d):
@@ -321,52 +387,141 @@ def about(th, d):
 
 
 # ------------------------------------------------------------------ proyectos
-PROJECTS = [
-    dict(repo="ProjeXus", title="ProjeXus", kind="TEAM PROJECT · 2025", role="Scrum Master",
-         desc="Project-competition management platform for ICTI Michoacán, with QR-verified certificates.",
-         third=("Stack", "TS + Java"), tags=["TypeScript", "Java", "Supabase"], link="github.com/TonyMed12/ProjeXus"),
-    dict(repo="Adopciones-CAAM", title="Adopciones CAAM", kind="CLIENT PROJECT · 2026", role="Team lead · requirements",
-         desc="Animal adoption registration, tracking and veterinary scheduling for the Centro de Atención Animal de Morelia.",
-         third=("Live", "Vercel"), tags=["Next.js", "TypeScript", "Docker"], link="caamorelia.vercel.app"),
-    dict(repo="Alvare-Ditana", title="Alvare Ditana", kind="CLIENT PROJECT · ACÁMBARO", role="Web development",
-         desc="Website for a café in Acámbaro, Guanajuato: menu, shop, directions and reviews, written in Spanish.",
-         third=("Stack", "Next.js 16"), tags=["React 19", "TypeScript", "Motion"], link="Acámbaro, Guanajuato", team="—"),
-    dict(repo="Aquamarine-Resort", title="Aquamarine Resort", kind="WEB PROJECT · 2025", role="Web development",
-         desc="Website for a resort, built with HTML and deployed on Vercel.",
-         third=("Live", "Vercel"), tags=["HTML", "Vercel"], link="aquamarine-resort.vercel.app", team="—"),
-    dict(repo="gestor-cfdi", title="Gestor CFDI", kind="SCHOOL PROJECT · 2026", role="Developer",
-         desc="Web app for accounting firms: reads and validates CFDI invoices and suggests classifications; the accountant approves.",
-         third=("Stack", "Next.js 16"), tags=["React 19", "Supabase", "Tailwind"], link="github.com/TonyMed12/gestor-cfdi"),
-]
+def load_projects():
+    items = json.loads((HERE / "projects.json").read_text(encoding="utf-8"))
+    items = [p for p in items if not p.get("draft")]  # "draft": true -> aun sin rellenar, no se publica
+    for p in items:
+        p.setdefault("owner", USER); p.setdefault("public_ok", False); p.setdefault("tags", []); p.setdefault("highlights", [])
+    return sorted(items, key=lambda p: p.get("order", 99))
 
 
-def slug(p):
-    return re.sub(r"[^a-z0-9]+", "-", p["repo"].lower()).strip("-")
+_ME = []
 
 
-def project(th, p, d, idx):
-    c, w, h = T[th], 480, 292
-    s = d["proj"].get(p["repo"], {})
-    cm, team = s.get("commits", 0), p.get("team", s.get("team", 1))
+def my_id():
+    if not _ME:
+        _ME.append(graphql("query($l:String!){user(login:$l){id}}", l=USER)["user"]["id"])
+    return _ME[0]
+
+
+def repo_metrics(p, cache):
+    """Metricas automaticas de owner/repo; {} si no hay repo; {"private": True} si no debe mostrarse."""
+    if not p.get("repo"): return {}
+    sl, full = p["slug"], f'{p["owner"]}/{p["repo"]}'
+    try:
+        info = get(f"{API}/repos/{full}")
+    except Exception as ex:
+        print(f"aviso: {sl}: no pude leer el repo ({why(ex)}); uso cache o datos manuales", file=sys.stderr)
+        return cache.get(sl) or ({} if p["public_ok"] else {"private": True})  # sin poder verificar, se asume privado
+    if info["private"] and not p["public_ok"]:
+        return {"private": True}
+    m, mine = {"pushed": info["pushed_at"][:10]}, None
+    if TOKEN:
+        try:
+            r = graphql("query($o:String!,$n:String!,$id:ID!){repository(owner:$o,name:$n){defaultBranchRef{target{... on Commit{history(author:{id:$id}){totalCount}}}}}}",
+                        o=p["owner"], n=p["repo"], id=my_id())
+            mine = r["repository"]["defaultBranchRef"]["target"]["history"]["totalCount"]
+        except Exception as ex:
+            print(f"aviso: {sl}: GraphQL de commits fallo ({why(ex)}); uso contributors", file=sys.stderr)
+    try:
+        people = [c for c in get(f"{API}/repos/{full}/contributors?per_page=100") if c.get("type") != "Bot" and "[bot]" not in c["login"]]
+        mc = next((c["contributions"] for c in people if c["login"].lower() == USER.lower()), 0)
+        m["team"] = len(people)
+        if mc: m["rank"] = 1 + sum(c["contributions"] > mc for c in people)
+        mine = max(mine or 0, mc)  # GraphQL puede dar 0 si el correo de los commits no esta vinculado a la cuenta
+    except Exception as ex:
+        print(f"aviso: {sl}: contributors fallo ({why(ex)})", file=sys.stderr)
+    try:
+        m["prs"] = get(f"{API}/search/issues?q=" + urllib.parse.quote(f"repo:{full} author:{USER} is:pr is:merged"))["total_count"]
+    except Exception as ex:
+        print(f"aviso: {sl}: busqueda de PRs fallo ({why(ex)})", file=sys.stderr)
+    m["commits"] = mine
+    for k, v in (cache.get(sl) or {}).items():  # lo que fallo hoy (None o ausente) se completa con el ultimo dato bueno
+        if m.get(k) is None: m[k] = v
+    if mine == 0:
+        print(f"aviso: {sl}: 0 commits tuyos en {full}. Probable: los commits se hicieron con un correo no vinculado a tu cuenta "
+              f"(GitHub > Settings > Emails) o el equipo uso squash merge (la tarjeta muestra los PRs fusionados: {m.get('prs')}).", file=sys.stderr)
+    return m
+
+
+def project_data(projects):
+    cache = json.loads(PCACHE.read_text(encoding="utf-8")) if PCACHE.exists() else {}
+    out = {}
+    for p in projects:
+        if "--offline" in sys.argv:  # sin red: si nunca se verifico como publico, se trata como privado
+            out[p["slug"]] = cache.get(p["slug"]) or ({} if (not p.get("repo") or p["public_ok"]) else {"private": True})
+        else:
+            out[p["slug"]] = repo_metrics(p, cache)
+    PCACHE.write_text(json.dumps({k: v for k, v in out.items() if v and not v.get("private")}, indent=1, sort_keys=True), encoding="utf-8")
+    return out
+
+
+def link_of(p, m):
+    ln = p.get("link", "")
+    return ln if ln.startswith("http") and not m.get("private") else ""
+
+
+def fit_kind(kind, avail):
+    for size, ls in ((9.5, 1.6), (8.6, .8), (8, .3)):
+        if len(kind) * (size * .62 + ls) <= avail: return size, ls, kind
+    n = max(8, int(avail / (8 * .62 + .3)) - 1)
+    return 8, .3, kind[:n].rstrip() + "…"
+
+
+def project(th, p, m, idx):
+    c, w = T[th], 480
+    hl = p["highlights"][:3]
+    dy = 20 + 18 * len(hl) if hl else 0
+    h = 292 + dy
+    private = bool(m.get("private"))
+    mine, prs = m.get("commits"), m.get("prs")
+    first = ("COMMITS", mine) if mine else (("PRS MERGED", prs) if prs else ("COMMITS", "—"))
+    team = p.get("team", m.get("team", "—"))
+    path = "private repository" if private else (f'{p["owner"]}/{p["repo"]}'.lower() if p.get("repo") and p["owner"].lower() != USER.lower() else "")
     b = tile(0.5, 0.5, w - 1, h - 1, th, 18)
     b += f'<rect x="0.5" y="22" width="4" height="64" rx="2" fill="{c["gold"]}"/>'
-    b += (tx(28, 42, f"{idx:02d}", 12, c["gold"], weight=700, serif=True, ls=1) + tx(w - 26, 42, p["kind"], 9.5, c["faint"], "end", 600, ls=1.6) +
-          tx(28, 80, p["title"], 25, c["fg"], weight=700, serif=True))
+    b += tx(28, 42, f"{idx:02d}", 12, c["gold"], weight=700, serif=True, ls=1)
+    used = 56
+    if path:
+        b += tx(54, 42, "· " + path, 9.5, c["dim"], weight=600); used = 54 + (len(path) + 2) * 5.9
+    size, ls, kind = fit_kind(p["kind"].upper(), w - 26 - used - 12)
+    b += tx(w - 26, 42, kind, size, c["faint"], "end", 600, ls=ls) + tx(28, 80, p["title"], 25, c["fg"], weight=700, serif=True)
     y = 106
     for ln in textwrap.wrap(p["desc"], 62)[:2]:
         b += tx(28, y, ln, 12.5, c["dim"]); y += 19
-    o, _ = chip(28, 150, p["role"], th, 11, c["gold"], bold=True); b += o
-    b += f'<line x1="28" x2="{w - 28}" y1="196" y2="196" stroke="{c["edge"]}" stroke-opacity="{c["edgeo"]}"/>'
-    mets = [(str(cm or "—"), "COMMITS"), (str(team), "PEOPLE"), (p["third"][1], p["third"][0].upper())]
-    for i, (num, lab) in enumerate(mets):
+    if p.get("role"):
+        o, _ = chip(28, 150, p["role"], th, 11, c["gold"], bold=True); b += o
+    if hl: b += tx(28, 192, "MY CONTRIBUTION", 9, c["faint"], weight=600, ls=1.6)
+    for i, t in enumerate(hl):
+        b += f'<circle cx="32" cy="{206 + 18 * i}" r="2.6" fill="{c["gold"]}"/>' + tx(42, 210 + 18 * i, t, 11.5, c["fg"])
+    b += f'<line x1="28" x2="{w - 28}" y1="{196 + dy}" y2="{196 + dy}" stroke="{c["edge"]}" stroke-opacity="{c["edgeo"]}"/>'
+    third = p.get("third") or ["", "—"]
+    for i, (num, lab) in enumerate([(str(first[1]), first[0]), (str(team), "PEOPLE"), (third[1], third[0].upper())]):
         mx = 28 + i * 140
-        b += tx(mx, 230, num, 22 if i < 2 else 15, c["fg"] if i < 2 else c["ice"], weight=700, serif=True) + tx(mx, 247, lab, 9, c["faint"], weight=600, ls=1.6)
+        b += tx(mx, 230 + dy, num, 22 if i < 2 else 15, c["fg"] if i < 2 else c["ice"], weight=700, serif=True) + tx(mx, 247 + dy, lab, 9, c["faint"], weight=600, ls=1.6)
     x = 28
     for t in p["tags"]:
-        wd = len(t) * 6.2 + 18
-        b += tx(f"{x:.0f}", 276, "# " + t, 10, c["ice"], weight=600); x += wd + 12
-    b += tx(w - 26, 276, p["link"] + " ↗", 10, c["faint"], "end")
-    return svg(w, h, th, f"{p['title']} — {p['kind']}", f'<g opacity="1">{b}</g>' + snow(th, w, h, 6, sum(map(ord, p["repo"]))))
+        b += tx(f"{x:.0f}", 276 + dy, "# " + t, 10, c["ice"], weight=600); x += len(t) * 6.2 + 30
+    label = "private repository" if private else (p.get("link_label") or re.sub(r"^https?://", "", p.get("link", "")).rstrip("/"))
+    if label: b += tx(w - 26, 276 + dy, label + (" ↗" if link_of(p, m) else ""), 10, c["faint"], "end")
+    return svg(w, h, th, f"{p['title']} — {p['kind']}", f'<g opacity="1">{b}</g>' + snow(th, w, h, 6, sum(map(ord, p["slug"]))))
+
+
+def pic(name, alt, link="", width="100%"):
+    t = (f'<picture><source media="(prefers-color-scheme: dark)" srcset="assets/{name}-dark.svg"><source media="(prefers-color-scheme: light)" '
+         f'srcset="assets/{name}-light.svg"><img alt="{html.escape(alt, quote=True)}" src="assets/{name}-dark.svg" width="{width}"></picture>')
+    return f'<a href="{link}">{t}</a>' if link else t
+
+
+def update_readme(projects, pm):
+    """Reescribe solo el bloque entre <!-- projects:start --> y <!-- projects:end --> (orden = campo "order")."""
+    rd = HERE.parent / "README.md"
+    if not rd.exists(): return
+    txt = rd.read_text(encoding="utf-8")
+    a, b = txt.find("<!-- projects:start -->"), txt.find("<!-- projects:end -->")
+    if a < 0 or b < a: return
+    cards = [pic(f"project-{p['slug']}", p["title"], link_of(p, pm[p["slug"]]), "49%") + ("<br>" if i % 2 else "") for i, p in enumerate(projects)]
+    rd.write_text(txt[:a] + "<!-- projects:start -->\n" + "\n".join(cards) + "\n" + txt[b:], encoding="utf-8")
 
 
 # ------------------------------------------------------------------ actividad
@@ -387,8 +542,8 @@ def activity(th, d):
     active = sum(1 for x in cal if x[1])
     b = snow(th, w, h, 14, 21)
     b += (tx(40, 52, "YEAR IN REVIEW", 10, c["gold"], weight=700, ls=3) + tx(40, 100, f"{total} contributions", 42, c["fg"], weight=700, serif=True) +
-          tx(40, 128, f"in the last 12 months  ·  {active} active days  ·  longest streak {best} days  ·  current {cur}", 12.5, c["dim"]))
-    for i, (num, lab) in enumerate([(d["user"]["repos"], "REPOSITORIES"), (d["commits"], "COMMITS"), (d["prs"], "PULL REQUESTS"), (active, "ACTIVE DAYS")]):
+          tx(40, 128, f"in the last 12 months  ·  {active} active days  ·  longest streak {best} days  ·  current {cur}" + (f"  ·  includes {d['private_1y']} private" if d.get("private_1y") else ""), 12.5, c["dim"]))
+    for i, (num, lab) in enumerate([(d.get("contributed") or d["user"]["repos"], "REPOS CONTRIBUTED TO" if d.get("contributed") else "REPOSITORIES"), (d["commits"], "COMMITS"), (d["prs"], "PULL REQUESTS"), (active, "ACTIVE DAYS")]):
         x = 24 + i * 239.3
         b += tile(x, 148, 218, 70, th) + tx(x + 20, 190, num, 30, c["fg"], weight=700, serif=True) + tx(x + 20, 206 - 2, "", 1, c["dim"]) + tx(x + 198, 192, lab, 9, c["faint"], "end", 600, ls=1.5)
     # area mensual
@@ -435,11 +590,16 @@ def activity(th, d):
 # ------------------------------------------------------------------ main
 if __name__ == "__main__":
     d = load()
-    for f in OUT.glob("*.svg"): f.unlink()
+    projects = load_projects()
+    pm = project_data(projects)
     for th in T:
         (OUT / f"hero-{th}.svg").write_text(hero(th, d), encoding="utf-8")
         (OUT / f"about-{th}.svg").write_text(about(th, d), encoding="utf-8")
         (OUT / f"activity-{th}.svg").write_text(activity(th, d), encoding="utf-8")
-        for i, p in enumerate(PROJECTS, 1):
-            (OUT / f"project-{slug(p)}-{th}.svg").write_text(project(th, p, d, i), encoding="utf-8")
+        for i, p in enumerate(projects, 1):
+            (OUT / f"project-{p['slug']}-{th}.svg").write_text(project(th, p, pm[p["slug"]], i), encoding="utf-8")
+    keep = {f"project-{p['slug']}-{th}.svg" for p in projects for th in T}
+    for f in OUT.glob("project-*.svg"):  # solo se borran las tarjetas de proyectos que ya no estan en projects.json
+        if f.name not in keep: f.unlink()
+    update_readme(projects, pm)
     print("ok:", len(list(OUT.glob("*.svg"))), "svg en", OUT)

@@ -1,0 +1,134 @@
+[
+  {
+    "slug": "projexus",
+    "owner": "TonyMed12",
+    "repo": "ProjeXus",
+    "title": "ProjeXus",
+    "kind": "Academic · 2025",
+    "role": "Scrum Master",
+    "desc": "Project-competition management platform for ICTI Michoacán, with QR-verified certificates.",
+    "tags": [
+      "TypeScript",
+      "Java",
+      "Supabase"
+    ],
+    "highlights": [
+      "Google OAuth 2.0 sign-in and reCAPTCHA on registration",
+      "PDF recognitions with QR generation and verification",
+      "Participant, judge and admin dashboards in Next.js"
+    ],
+    "third": [
+      "Stack",
+      "TS + Java"
+    ],
+    "link": "https://github.com/TonyMed12/ProjeXus",
+    "public_ok": true,
+    "order": 2
+  },
+  {
+    "slug": "adopciones-caam",
+    "owner": "TonyMed12",
+    "repo": "Adopciones-CAAM",
+    "title": "Adopciones CAAM",
+    "kind": "Academic · 2026",
+    "role": "Team lead · requirements",
+    "desc": "Animal adoption registration, tracking and veterinary scheduling for the Centro de Atención Animal de Morelia.",
+    "tags": [
+      "Next.js",
+      "TypeScript",
+      "Docker"
+    ],
+    "highlights": [
+      "Auth with Better Auth: Google and GitHub sign-in",
+      "Adoption and vet-appointment emails, verification flow",
+      "CI workflows, Docker deployment and unit tests"
+    ],
+    "third": [
+      "Live",
+      "Vercel"
+    ],
+    "link": "https://caamorelia.vercel.app",
+    "public_ok": true,
+    "order": 3
+  },
+  {
+    "slug": "alvare-ditana",
+    "owner": "TonyMed12",
+    "repo": null,
+    "title": "Alvare Ditana",
+    "kind": "Client project · Acámbaro",
+    "role": "Web development",
+    "desc": "Website for a café in Acámbaro, Guanajuato: menu, shop, directions and reviews, written in Spanish.",
+    "tags": [
+      "React 19",
+      "TypeScript",
+      "Motion"
+    ],
+    "highlights": [
+      "Menu, shop, directions and reviews sections",
+      "SEO: structured data (JSON-LD) and page metadata",
+      "Animated hero and gallery with Motion"
+    ],
+    "third": [
+      "Stack",
+      "Next.js 16"
+    ],
+    "team": "—",
+    "link": "",
+    "link_label": "Acámbaro, Guanajuato",
+    "public_ok": false,
+    "order": 4
+  },
+  {
+    "slug": "gestor-cfdi",
+    "owner": "TonyMed12",
+    "repo": "gestor-cfdi",
+    "title": "Gestor CFDI",
+    "kind": "School project · 2026",
+    "role": "Team lead",
+    "desc": "Web app for accounting firms: reads and validates CFDI invoices and suggests classifications; the accountant approves.",
+    "tags": [
+      "React 19",
+      "Supabase",
+      "Tailwind"
+    ],
+    "highlights": [
+      "CFDI 4.0 reading, upload and SAT verification",
+      "Client classification by firm into preset categories",
+      "Database schema, user management and sprint plan"
+    ],
+    "third": [
+      "Stack",
+      "Next.js 16"
+    ],
+    "link": "https://github.com/TonyMed12/gestor-cfdi",
+    "public_ok": true,
+    "order": 6
+  },
+  {
+    "slug": "hackapony",
+    "owner": "EnrMar17",
+    "repo": "Hackapony",
+    "title": "RutaSegura ITM",
+    "kind": "Hackathon · 2026",
+    "role": "Team lead",
+    "desc": "Public-transport web app for Morelia: live route map, trip planner with ETAs, crowding reports and an operator panel.",
+    "tags": [
+      "TypeScript",
+      "Next.js",
+      "PostgreSQL"
+    ],
+    "highlights": [
+      "Interactive map: routes, stops, ETA bubbles, dark mode",
+      "Trip planner: nearest route, walking leg and ETA",
+      "Operator panel with unit simulator and incidents"
+    ],
+    "third": [
+      "Live",
+      "Vercel"
+    ],
+    "link": "https://mobilidadurbanaitm.vercel.app",
+    "public_ok": true,
+    "order": 1
+  }
+]
