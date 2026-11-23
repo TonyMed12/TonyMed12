@@ -334,23 +334,19 @@ TOOLBOX = [
 
 
 def toolbox(th, y0):
-    """Etiquetas por grupo en 4 columnas; devuelve (svg, alto)."""
-    c, out, y = T[th], "", y0
-    for r in range(0, len(TOOLBOX), 4):
-        rh = 0
-        for i, (g, items) in enumerate(TOOLBOX[r:r + 4]):
-            gx = x = 44 + i * 224
-            yy = y + 12
-            out += tx(gx, y, g, 10.5, c["dim"], weight=600)
-            for t in items:
-                wd = len(t) * 6.4 + 20
-                if x + wd > gx + 208: x, yy = gx, yy + 30
-                out += (f'<rect x="{x:.0f}" y="{yy}" width="{wd:.0f}" height="24" rx="12" fill="none" stroke="{c["ice"]}" stroke-opacity=".6"/>' +
-                        tx(f"{x + 10:.0f}", yy + 16, t, 11, c["fg"]))
-                x += wd + 6
-            rh = max(rh, yy + 24 - y)
-        y += rh + 22
-    return out, y - y0
+    """Una fila por grupo: etiqueta a la izquierda y herramientas en linea separadas por puntos; devuelve (svg, alto)."""
+    c, out = T[th], ""
+    dots = [c["gold"], c["ice"], c["ok"], "#f472b6", "#a78bfa", "#f59e0b", "#38bdf8", "#fb7185"]
+    for i, (g, items) in enumerate(TOOLBOX):
+        y, dl = y0 + i * 32, .3 + i * .08
+        if i: out += f'<line x1="44" x2="941" y1="{y - 18}" y2="{y - 18}" stroke="{c["edge"]}" stroke-opacity="{c["edgeo"]}"/>'
+        out += (f'<circle cx="48" cy="{y - 4}" r="3.5" fill="{dots[i % len(dots)]}"/>' + tx(60, y, g, 11, c["dim"], weight=600, cls="up", delay=dl))
+        x = 216
+        for k, t in enumerate(items):
+            if k:
+                out += tx(f"{x:.0f}", y, "·", 13, c["faint"], cls="up", delay=dl); x += 14
+            out += tx(f"{x:.0f}", y, t, 12.5, c["fg"], cls="up", delay=dl); x += len(t) * 6.5 + 12
+    return out, 32 * len(TOOLBOX) - 6
 
 
 def about(th, d):
@@ -475,7 +471,7 @@ def fit_kind(kind, avail):
 def project(th, p, m, idx):
     c, w = T[th], 480
     hl = p["highlights"][:3]
-    dy = 18 * len(hl)
+    dy = 20 + 18 * len(hl) if hl else 0
     h = 292 + dy
     private = bool(m.get("private"))
     mine, prs = m.get("commits"), m.get("prs")
@@ -495,8 +491,9 @@ def project(th, p, m, idx):
         b += tx(28, y, ln, 12.5, c["dim"]); y += 19
     if p.get("role"):
         o, _ = chip(28, 150, p["role"], th, 11, c["gold"], bold=True); b += o
+    if hl: b += tx(28, 192, "MY CONTRIBUTION", 9, c["faint"], weight=600, ls=1.6)
     for i, t in enumerate(hl):
-        b += f'<circle cx="32" cy="{188 + 18 * i}" r="2.6" fill="{c["gold"]}"/>' + tx(42, 192 + 18 * i, t, 11.5, c["fg"])
+        b += f'<circle cx="32" cy="{206 + 18 * i}" r="2.6" fill="{c["gold"]}"/>' + tx(42, 210 + 18 * i, t, 11.5, c["fg"])
     b += f'<line x1="28" x2="{w - 28}" y1="{196 + dy}" y2="{196 + dy}" stroke="{c["edge"]}" stroke-opacity="{c["edgeo"]}"/>'
     third = p.get("third") or ["", "—"]
     for i, (num, lab) in enumerate([(str(first[1]), first[0]), (str(team), "PEOPLE"), (third[1], third[0].upper())]):

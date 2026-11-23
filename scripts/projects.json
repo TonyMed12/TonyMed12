@@ -12,7 +12,11 @@
       "Java",
       "Supabase"
     ],
-    "highlights": [],
+    "highlights": [
+      "Google OAuth 2.0 sign-in and reCAPTCHA on registration",
+      "PDF recognitions with QR generation and verification",
+      "Participant, judge and admin dashboards in Next.js"
+    ],
     "third": [
       "Stack",
       "TS + Java"
@@ -34,7 +38,11 @@
       "TypeScript",
       "Docker"
     ],
-    "highlights": [],
+    "highlights": [
+      "Auth with Better Auth: Google and GitHub sign-in",
+      "Adoption and vet-appointment emails, verification flow",
+      "CI workflows, Docker deployment and unit tests"
+    ],
     "third": [
       "Live",
       "Vercel"
@@ -56,7 +64,11 @@
       "TypeScript",
       "Motion"
     ],
-    "highlights": [],
+    "highlights": [
+      "Menu, shop, directions and reviews sections",
+      "SEO: structured data (JSON-LD) and page metadata",
+      "Animated hero and gallery with Motion"
+    ],
     "third": [
       "Stack",
       "Next.js 16"
@@ -73,14 +85,18 @@
     "repo": "gestor-cfdi",
     "title": "Gestor CFDI",
     "kind": "School project · 2026",
-    "role": "Developer",
+    "role": "Team lead",
     "desc": "Web app for accounting firms: reads and validates CFDI invoices and suggests classifications; the accountant approves.",
     "tags": [
       "React 19",
       "Supabase",
       "Tailwind"
     ],
-    "highlights": [],
+    "highlights": [
+      "CFDI 4.0 reading, upload and SAT verification",
+      "Client classification by firm into preset categories",
+      "Database schema, user management and sprint plan"
+    ],
     "third": [
       "Stack",
       "Next.js 16"
@@ -93,16 +109,20 @@
     "slug": "hackapony",
     "owner": "EnrMar17",
     "repo": "Hackapony",
-    "title": "Hackapony",
+    "title": "RutaSegura ITM",
     "kind": "Hackathon · 2026",
-    "role": "Developer",
-    "desc": "Urban mobility web app for the ITM, built during a hackathon and deployed on Vercel.",
+    "role": "Team lead",
+    "desc": "Public-transport web app for Morelia: live route map, trip planner with ETAs, crowding reports and an operator panel.",
     "tags": [
       "TypeScript",
-      "PostgreSQL",
-      "Vercel"
+      "Next.js",
+      "PostgreSQL"
     ],
-    "highlights": [],
+    "highlights": [
+      "Interactive map: routes, stops, ETA bubbles, dark mode",
+      "Trip planner: nearest route, walking leg and ETA",
+      "Operator panel with unit simulator and incidents"
+    ],
     "third": [
       "Live",
       "Vercel"
