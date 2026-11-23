@@ -1,0 +1,43 @@
+name: Profile cards
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # todos los dias, 1:00 a. m. en Morelia
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["scripts/**", ".github/workflows/profile.yml"] # el commit del bot solo toca assets/ y README.md, asi que no se re-dispara
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-cards
+  cancel-in-progress: true
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check PROFILE_TOKEN
+        env:
+          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+        run: |
+          if [ -z "$PROFILE_TOKEN" ]; then
+            echo "::warning::PROFILE_TOKEN no esta configurado: se usa el modo publico (sin actividad privada ni repos privados)."
+          fi
+      - name: Generate cards
+        env:
+          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/build.py
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets README.md
+          git diff --staged --quiet || (git commit -m "chore: update profile cards" && git push)
